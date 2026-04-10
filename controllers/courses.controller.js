@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const Course = require("../models/course.model");
 const { SUCCESS, FAIL, ERROR } = require("../utils/httpStatusText");
+const AppError = require("../utils/appError");
 
 const getAllCourses = async (req, res) => {
   const query = req.query;
@@ -9,9 +10,7 @@ const getAllCourses = async (req, res) => {
   const page = parseInt(query.page) || 1;
   const skip = (page - 1) * limit;
 
-  const courses = await Course.find({}, "-__v")
-    .limit(limit)
-    .skip(skip);
+  const courses = await Course.find({}, "-__v").limit(limit).skip(skip);
   res.status(200).json({
     status: SUCCESS,
     data: { courses },
@@ -19,28 +18,23 @@ const getAllCourses = async (req, res) => {
 };
 
 const getCourseById = async (req, res) => {
-  try {
-    const course = await Course.findById(req.params.id);
+  const course = await Course.findById(req.params.id);
 
-    if (!course) {
-      return res.status(404).json({ status: FAIL, data: { course: null } });
-    }
-
-    res.status(200).json({
-      status: SUCCESS,
-      data: { course },
-    });
-  } catch (error) {
-    res.status(500).json({ status: ERROR, data: null, message: error.message });
+  if (!course) {
+    throw new AppError("Course not found", 404);
   }
+
+  res.status(200).json({
+    status: SUCCESS,
+    data: { course },
+  });
 };
 
 const addCourse = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res
-      .status(400)
-      .json({ status: FAIL, data: { errors: errors.array() } });
+    const error = new AppError("Validation failed", 400, errors.array());
+    throw error;
   }
 
   const { title, description, price } = req.body;
@@ -78,15 +72,13 @@ const deleteCourse = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    return res
-      .status(400)
-      .json({ status: FAIL, data: { message: "Course ID is required" } });
+    throw new AppError("Course ID is required", 400);
   }
 
   const course = await Course.findByIdAndDelete(id);
 
   if (!course) {
-    return res.status(404).json({ status: FAIL, data: { course: null } });
+    throw new AppError("Course not found", 404);
   }
 
   res.status(200).json({

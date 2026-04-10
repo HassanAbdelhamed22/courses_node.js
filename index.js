@@ -3,13 +3,15 @@ require("dotenv").config();
 const express = require("express");
 const coursesRouter = require("./routes/courses.route");
 const { errorHandler } = require("./middleware/errorMiddleware");
+const cors = require("cors");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
 const mongoose = require("mongoose");
-const { ERROR } = require("./utils/httpStatusText");
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
