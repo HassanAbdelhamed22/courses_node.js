@@ -3,7 +3,15 @@ const Course = require("../models/course.model");
 const { SUCCESS, FAIL, ERROR } = require("../utils/httpStatusText");
 
 const getAllCourses = async (req, res) => {
-  const courses = await Course.find({}, "-__v");
+  const query = req.query;
+
+  const limit = parseInt(query.limit) || 10;
+  const page = parseInt(query.page) || 1;
+  const skip = (page - 1) * limit;
+
+  const courses = await Course.find({}, "-__v")
+    .limit(limit)
+    .skip(skip);
   res.status(200).json({
     status: SUCCESS,
     data: { courses },
