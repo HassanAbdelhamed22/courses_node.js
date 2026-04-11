@@ -8,7 +8,9 @@ const getAllUsers = async (req, res) => {
   const page = parseInt(query.page) || 1;
   const skip = (page - 1) * limit;
 
-  const users = await User.find({}, "-__v").limit(limit).skip(skip);
+  const users = await User.find({}, { "-__v": false, "-password": false })
+    .limit(limit)
+    .skip(skip);
   res.status(200).json({
     status: SUCCESS,
     data: { users },

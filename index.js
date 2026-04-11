@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const coursesRouter = require("./routes/courses.route");
 const usersRouter = require("./routes/users.route");
+const authRouter = require("./routes/auth.route");
 const { errorHandler } = require("./middleware/errorMiddleware");
 const cors = require("cors");
 
@@ -24,6 +25,7 @@ mongoose
 
 const port = process.env.PORT || 3000;
 
+app.use("/api/auth", authRouter);
 app.use("/api/courses", coursesRouter);
 app.use("/api/users", usersRouter);
 
