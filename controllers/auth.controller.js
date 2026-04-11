@@ -2,6 +2,8 @@ const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const AppError = require("../utils/appError");
 const { SUCCESS } = require("../utils/httpStatusText");
+const jwt = require("jsonwebtoken");
+const generateJWT = require("../utils/generateJWT");
 
 const register = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -25,6 +27,11 @@ const register = async (req, res) => {
     email,
     password: hashedPassword,
   });
+
+  // generate token
+  const token = await generateJWT({ id: user._id, email: user.email });
+  user.token = token;
+
   await user.save();
 
   const response = {
@@ -32,6 +39,7 @@ const register = async (req, res) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    token: user.token,
   };
 
   res.status(201).json({
@@ -58,11 +66,16 @@ const login = async (req, res) => {
     throw new AppError("Invalid email or password", 401);
   }
 
+  // generate token
+  const token = await generateJWT({ id: user._id, email: user.email });
+  user.token = token;
+
   const response = {
     id: user._id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    token: user.token,
   };
 
   res.status(200).json({
