@@ -29,7 +29,11 @@ const register = async (req, res) => {
   });
 
   // generate token
-  const token = await generateJWT({ id: user._id, email: user.email });
+  const token = await generateJWT({
+    id: user._id,
+    email: user.email,
+    role: user.role,
+  });
   user.token = token;
 
   await user.save();
@@ -40,6 +44,7 @@ const register = async (req, res) => {
     lastName: user.lastName,
     email: user.email,
     token: user.token,
+    role: user.role,
   };
 
   res.status(201).json({
@@ -67,7 +72,11 @@ const login = async (req, res) => {
   }
 
   // generate token
-  const token = await generateJWT({ id: user._id, email: user.email });
+  const token = await generateJWT({
+    id: user._id,
+    email: user.email,
+    role: user.role,
+  });
   user.token = token;
 
   const response = {
@@ -76,6 +85,7 @@ const login = async (req, res) => {
     lastName: user.lastName,
     email: user.email,
     token: user.token,
+    role: user.role,
   };
 
   res.status(200).json({
