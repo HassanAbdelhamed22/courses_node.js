@@ -26,6 +26,7 @@ const register = async (req, res) => {
     lastName,
     email,
     password: hashedPassword,
+    avatar: req.file ? req.file.filename : undefined,
   });
 
   // generate token
@@ -45,6 +46,7 @@ const register = async (req, res) => {
     email: user.email,
     token: user.token,
     role: user.role,
+    avatar: user.avatar,
   };
 
   res.status(201).json({
@@ -86,6 +88,7 @@ const login = async (req, res) => {
     email: user.email,
     token: user.token,
     role: user.role,
+    avatar: user.avatar,
   };
 
   res.status(200).json({

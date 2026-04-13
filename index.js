@@ -6,8 +6,11 @@ const usersRouter = require("./routes/users.route");
 const authRouter = require("./routes/auth.route");
 const { errorHandler } = require("./middleware/errorMiddleware");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors());
 
